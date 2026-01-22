@@ -1,0 +1,85 @@
+CREATE DATABASE IF NOT EXISTS ECOM_REVENUE;
+
+USE DATABASE ECOM_REVENUE;
+
+CREATE SCHEMA IF NOT EXISTS RAW;
+CREATE SCHEMA IF NOT EXISTS STAGING;
+CREATE SCHEMA IF NOT EXISTS ANALYTICS; 
+
+SHOW SCHEMAS IN DATABASE ECOM_REVENUE;
+
+USE DATABASE ECOM_REVENUE;
+USE SCHEMA RAW;
+
+CREATE OR REPLACE TABLE customers (
+customer_id STRING,
+customer_name STRING,
+signup_date DATE,
+country STRING
+);
+
+CREATE OR REPLACE TABLE orders(
+order_id STRING,
+customer_id STRING,
+order_date DATE,
+order_status STRING,
+order_amount NUMBER(10,2)
+);
+
+CREATE OR REPLACE TABLE payments(
+payment_id STRING,
+order_id STRING,
+payment_date DATE,
+payment_status STRING,
+amount_paid NUMBER(10,2)
+);
+
+CREATE OR REPLACE TABLE refunds(
+refund_id STRING,
+order_id STRING,
+refund_date DATE,
+refund_amount NUMBER(10,2)
+);
+
+SHOW TABLES IN SCHEMA ECOM_REVENUE.RAW;
+
+
+SELECT 'customers' AS table_name, COUNT(*) AS cnt FROM ECOM_REVENUE.RAW.customers
+UNION ALL
+SELECT 'orders', COUNT(*) FROM ECOM_REVENUE.RAW.orders
+UNION ALL
+SELECT 'payments', COUNT(*) FROM ECOM_REVENUE.RAW.payments
+UNION ALL
+SELECT 'refunds', COUNT(*) FROM ECOM_REVENUE.RAW.refunds;
+
+
+SELECT *
+FROM ECOM_REVENUE.RAW.orders
+WHERE customer_id IS NULL;
+
+SELECT *
+FROM ECOM_REVENUE.RAW.payments
+WHERE order_id IS NULL;
+
+SELECT *
+FROM ECOM_REVENUE.RAW.refunds
+WHERE order_id IS NULL;
+
+SELECT payment_id 
+FROM ECOM_REVENUE.RAW.payments;
+
+SELECT o.order_id,o.order_status,p.payment_status
+FROM ECOM_REVENUE.RAW.orders o
+JOIN ECOM_REVENUE.RAW.payments p
+ON o.order_id=p.payment_id
+WHERE o.order_status = 'CANCELLED';
+
+SELECT *
+FROM ECOM_REVENUE.RAW.payments
+WHERE payment_status = 'FAILED';
+
+SELECT o.order_id
+FROM ECOM_REVENUE.RAW.orders o
+LEFT JOIN ECOM_REVENUE.RAW.payments p
+ON o.order_id = p.order_id
+WHERE p.order_id is NULL ;
