@@ -1,0 +1,3 @@
+refund_id,order_id,refund_date,refund_amount
+R7001,O1002,2023-03-06,80
+R7002,O1005,2023-03-07,50
